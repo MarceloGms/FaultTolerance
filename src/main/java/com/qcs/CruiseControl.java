@@ -20,17 +20,25 @@ public class CruiseControl {
    public double calculateAcceleration() {
       prev_speed.add(current_speed);
 
+      // Calculate the average speed
+      double sum = 0;
+      for (int speed : prev_speed) {
+         sum += speed;
+      }
+      double average_speed = sum / prev_speed.size();
+
       int lowerBound = set_speed - error;
       int upperBound = set_speed + error;
 
-      if (current_speed >= lowerBound && current_speed <= upperBound) {
-         return 0.0; // No acceleration needed
+      // If the average speed is within the error bounds, return 0
+      if (average_speed >= lowerBound && average_speed <= upperBound) {
+         return 0.0;
       }
 
+      // If not within the error bounds, calculate the required change in speed
       double requiredChange = set_speed - current_speed;
       double acceleration = Math.min(Math.abs(requiredChange), max_accel);
 
-      // Apply the correct sign for acceleration or deceleration
       return requiredChange > 0 ? acceleration : -acceleration;
    }
 }
