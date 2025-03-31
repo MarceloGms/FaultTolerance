@@ -1,45 +1,77 @@
 package com.qcs;
 
 import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class CruiseControl {
-   private int set_speed;
-   private int error;
-   private int max_accel;
-   private int current_speed;
-   private List<Integer> prev_speed;
-
-   public CruiseControl(int set_speed, int error, int max_accel, int current_speed, List<Integer> prev_speed) {
-      this.set_speed = set_speed;
-      this.error = error;
-      this.max_accel = max_accel;
-      this.current_speed = current_speed;
-      this.prev_speed = prev_speed;
-   }
-
-   public double calculateAcceleration() {
-      prev_speed.add(current_speed);
-
-      // Calculate the average speed
+   public static double calcAccel(int setSpeed, int error, int maxAccel, int currentSpeed, List<Integer> prevSpeeds) {
+      // Calculate average speed
       double sum = 0;
-      for (int speed : prev_speed) {
+      for (int speed : prevSpeeds) {
          sum += speed;
       }
-      double average_speed = sum / prev_speed.size();
+      double averageSpeed = sum / prevSpeeds.size();
 
-      int lowerBound = set_speed - error;
-      int upperBound = set_speed + error;
+      int lowerBound = setSpeed - error;
+      int upperBound = setSpeed + error;
 
-      // If the average speed is within the error bounds, return 0
-      if (average_speed >= lowerBound && average_speed <= upperBound) {
-         return 0.0;
+      if (averageSpeed >= lowerBound && averageSpeed <= upperBound) {
+         return 0.0; // No acceleration needed
       }
 
-      // If not within the error bounds, calculate the required change in speed
-      double requiredChange = set_speed - current_speed;
-      double acceleration = Math.min(Math.abs(requiredChange), max_accel);
+      // Calculate acceleration
+      double requiredChange = setSpeed - currentSpeed;
+      double acceleration = Math.min(Math.abs(requiredChange), maxAccel);
+
+      return requiredChange > 0 ? acceleration : -acceleration;
+   }
+
+
+   public static double faultToleranceCalcAccel(int setSpeed, int error, int maxAccel, int currentSpeed, List<Integer> prevSpeeds) {
+      // Validate parameters
+      if (maxAccel <= 0) {
+         throw new IllegalArgumentException("Max acceleration must be non-negative.");
+      }
+      if (setSpeed <= 0 || currentSpeed < 0) {
+         throw new IllegalArgumentException("Speed values must be non-negative.");
+      }
+      if (error < 0) {
+         throw new IllegalArgumentException("Error must be non-negative.");
+      }
+      if (prevSpeeds == null || prevSpeeds.isEmpty()) {
+         prevSpeeds = Arrays.asList(currentSpeed);
+      }
+
+      // Remove extreme outliers
+      prevSpeeds = prevSpeeds.stream()
+      .filter(speed -> speed > 0 && speed < 300) // Valid speed range 0-300 km/h
+      .collect(Collectors.toList());
+      
+      final int SPEED_HISTORY_LIMIT = 5;
+      if (prevSpeeds.size() >= SPEED_HISTORY_LIMIT) {
+         prevSpeeds = prevSpeeds.subList(prevSpeeds.size() - SPEED_HISTORY_LIMIT, prevSpeeds.size());
+      }
+      prevSpeeds.add(currentSpeed);
+
+      // Calculate average speed
+      double sum = 0;
+      for (int speed : prevSpeeds) {
+         sum += speed;
+      }
+      double averageSpeed = sum / prevSpeeds.size();
+
+      int lowerBound = setSpeed - error;
+      int upperBound = setSpeed + error;
+
+      if (averageSpeed >= lowerBound && averageSpeed <= upperBound) {
+         return 0.0; // No acceleration needed
+      }
+
+      // Calculate acceleration
+      double requiredChange = setSpeed - currentSpeed;
+      double acceleration = Math.min(Math.abs(requiredChange), maxAccel);
 
       return requiredChange > 0 ? acceleration : -acceleration;
    }
 }
-

@@ -11,7 +11,7 @@ public class App
 {
     public static void main( String[] args )
     {
-        System.out.println("\n-------\n FR2: Cruise Control\n-------\n");
+        System.out.println("\n-------\n FR2: Cruise Control\n");
 
         // Example parameters for CruiseControl
         int setSpeed = 120; // Desired speed in km/h
@@ -24,14 +24,14 @@ public class App
         prevSpeed.add(100);
         prevSpeed.add(100);
 
-        // Create a CruiseControl instance
-        CruiseControl cruiseControl = new CruiseControl(setSpeed, error, maxAccel, currentSpeed, prevSpeed);
-
-        // Call calculateAcceleration with the current speed
-        double acceleration = cruiseControl.calculateAcceleration();
+        double accel = CruiseControl.calcAccel(setSpeed, error, maxAccel, currentSpeed, prevSpeed);
+        double faultToleranceAccel = CruiseControl.faultToleranceCalcAccel(setSpeed, error, maxAccel, currentSpeed, prevSpeed);
 
         // Print the output
-        System.out.printf(" Output: %.2f\n", acceleration);
+        System.out.printf(" Output: %.2f\n", accel);
+        System.out.printf(" FT Output: %.2f\n", faultToleranceAccel);
+
+        System.out.println("-------");
 
         System.out.println("\n-------\n FR3: Tyre Pressure\n-------\n");
         new TyrePressure();
