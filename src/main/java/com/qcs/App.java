@@ -24,8 +24,14 @@ public class App
         prevSpeed.add(100);
         prevSpeed.add(100);
 
+        // Initialize speedReadings with [100, 100, 10000]
+        ArrayList<Integer> speedReadings = new ArrayList<>();
+        speedReadings.add(100);
+        speedReadings.add(100);
+        speedReadings.add(10000); // outlier
+
         double accel = CruiseControl.calcAccel(setSpeed, error, maxAccel, currentSpeed, prevSpeed);
-        double faultToleranceAccel = CruiseControl.faultToleranceCalcAccel(setSpeed, error, maxAccel, currentSpeed, prevSpeed);
+        double faultToleranceAccel = CruiseControl.faultToleranceCalcAccel(setSpeed, error, maxAccel, speedReadings, prevSpeed);
 
         // Print the output
         System.out.printf(" Output: %.2f\n", accel);
