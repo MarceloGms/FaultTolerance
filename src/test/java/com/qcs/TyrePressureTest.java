@@ -13,7 +13,7 @@ class TyrePressureTest {
             List.of(10), List.of(10), List.of(10), List.of(10)
         );
         int targetPressure = 5;
-        assertEquals(List.of(), TyrePressureWithFaultTolarance.getTyresWithLowPressure(pressures, targetPressure));
+        assertEquals(List.of(), TyrePressureWithFaultTolerance.getTyresWithLowPressure(pressures, targetPressure));
     }
 
     @Test
@@ -22,7 +22,7 @@ class TyrePressureTest {
             List.of(10, 10), List.of(10, 10), List.of(10, 10), List.of(10, 10)
         );
         int targetPressure = 5;
-        assertEquals(List.of(), TyrePressureWithFaultTolarance.getTyresWithLowPressure(pressures, targetPressure));
+        assertEquals(List.of(), TyrePressureWithFaultTolerance.getTyresWithLowPressure(pressures, targetPressure));
     }
 
     @Test
@@ -31,7 +31,7 @@ class TyrePressureTest {
             List.of(10, 10), List.of(30, 30), List.of(20, 20), List.of(40, 40)
         );
         int targetPressure = 100;
-        assertEquals(List.of(0, 2, 1, 3), TyrePressureWithFaultTolarance.getTyresWithLowPressure(pressures, targetPressure));
+        assertEquals(List.of(0, 1, 2, 3), TyrePressureWithFaultTolerance.getTyresWithLowPressure(pressures, targetPressure));
     }
 
     @Test
@@ -40,7 +40,7 @@ class TyrePressureTest {
             List.of(10), List.of(1), List.of(10), List.of(10)
         );
         int targetPressure = 5;
-        assertEquals(List.of(1), TyrePressureWithFaultTolarance.getTyresWithLowPressure(pressures, targetPressure));
+        assertEquals(List.of(1), TyrePressureWithFaultTolerance.getTyresWithLowPressure(pressures, targetPressure));
     }
 
     @Test
@@ -49,6 +49,6 @@ class TyrePressureTest {
             List.of(0, 15), List.of(10, 10), List.of(10, 10), List.of(10, 10)
         );
         int targetPressure = 8;
-        assertEquals(List.of(), TyrePressureWithFaultTolarance.getTyresWithLowPressure(pressures, targetPressure));
+        assertEquals(List.of(1, 2, 3), TyrePressureWithFaultTolerance.getTyresWithLowPressure(pressures, targetPressure));
     }
 }
