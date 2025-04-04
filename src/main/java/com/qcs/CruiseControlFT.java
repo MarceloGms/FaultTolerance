@@ -32,6 +32,7 @@ public class CruiseControlFT {
       } else { // If speed readings are invalid or CRC check fails, use previous speeds only
          if (prevSpeeds == null || prevSpeeds.isEmpty()) { 
             System.out.println("No previous speeds available. Cannot compute acceleration.");
+            System.out.println("WARNING: No speed readings available. You are advised to take manual control of the vehicle.");
             return 0.0;
          }
          System.out.println("Current speed readings are empty or invalid. Using previous speeds only.");
@@ -51,7 +52,8 @@ public class CruiseControlFT {
             System.out.println("Previous speeds are empty. Using current speed only.");
             prevSpeeds = Arrays.asList(currentSpeed);
          } else {
-            System.out.println("No valid speed readings available. Cannot compute acceleration.");
+            System.out.println("No current speed readings available. Cannot compute acceleration.");
+            System.out.println("WARNING: No speed readings available. You are advised to take manual control of the vehicle.");
             return 0.0;
          }
       }
