@@ -2,44 +2,35 @@ package com.qcs;
 
 import java.util.ArrayList;
 
-/* problems:
-software bugs
-errors passing parameters calling our function like wrong order
-sensors can break and give us wrong data like 10000
-radiation from the sun can eat the cpu (soft errors)  */
 public class App 
 {
     public static void main( String[] args )
     {
         System.out.println("\n-------\n FR2: Cruise Control\n");
 
-        // Example parameters for CruiseControl
-        int setSpeed = 120; // Desired speed in km/h
-        int error = 0;      // Acceptable error in km/h
-        int maxAccel = 10;  // Maximum acceleration in km/h²
-        int currentSpeed = 100; // Current speed in km/h
+        int setSpeed = 120;
+        int error = 0;
+        int maxAccel = 10;
+        int currentSpeed = 100;
 
-        // Initialize prevSpeed with [100, 100]
         ArrayList<Integer> prevSpeed = new ArrayList<>();
         prevSpeed.add(100);
         prevSpeed.add(100);
 
-        // Initialize speedReadings with [100, 100, 10000]
         ArrayList<Integer> speedReadings = new ArrayList<>();
         speedReadings.add(100);
         speedReadings.add(100);
         speedReadings.add(10000); // outlier
 
+        // No fault Tolerance
         double accel = CruiseControl.calcAccel(setSpeed, error, maxAccel, currentSpeed, prevSpeed);
-        double faultToleranceAccel = CruiseControl.faultToleranceCalcAccel(setSpeed, error, maxAccel, speedReadings, prevSpeed);
-
-        // Print the output
         System.out.printf(" Output: %.2f\n", accel);
+
+        // With Fault Tolerance
+        int crcOriginal = CruiseControlFT.computeCRC(speedReadings);
+        double faultToleranceAccel = CruiseControlFT.faultToleranceCalcAccel(setSpeed, error, maxAccel, speedReadings, prevSpeed, crcOriginal);
         System.out.printf(" FT Output: %.2f\n", faultToleranceAccel);
 
         System.out.println("-------");
-
-        System.out.println("\n-------\n FR3: Tyre Pressure\n-------\n");
-        new TyrePressure();
     }
 }
