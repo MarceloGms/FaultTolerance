@@ -28,7 +28,7 @@ public class App
 
         // With Fault Tolerance
         int crcOriginal = CruiseControlFT.computeCRC(speedReadings);
-        double faultToleranceAccel = CruiseControlFT.faultToleranceCalcAccel(setSpeed, error, maxAccel, speedReadings, prevSpeed, crcOriginal);
+        double faultToleranceAccel = CruiseControlFT.CalcAccel(setSpeed, error, maxAccel, speedReadings, prevSpeed, crcOriginal);
         System.out.printf(" FT Output: %.2f\n", faultToleranceAccel);
 
         System.out.println("-------");

@@ -6,36 +6,12 @@ import java.util.stream.Collectors;
 
 public class CruiseControlFT {
    private static final int SAFE_ACCEL = 2;
-   public static double faultToleranceCalcAccel(int setSpeed, int error, int maxAccel, List<Integer> speedReadings, List<Integer> prevSpeeds, int crcOriginal) {
+   public static double CalcAccel(int setSpeed, int error, int maxAccel, List<Integer> speedReadings, List<Integer> prevSpeeds, int crcOriginal) {
       // Validate parameters
       if (maxAccel <= 0) {
          System.out.println("Invalid max acceleration. Using safe fallback value.");
          maxAccel = SAFE_ACCEL;
       }
-
-      int currentSpeed = 0;
-      if (speedReadings != null && !speedReadings.isEmpty()) {
-            speedReadings = speedReadings.stream()
-         .filter(speed -> speed > 0 && speed < 300) // Valid range
-         .collect(Collectors.toList());
-         // Calculate reliable speed
-         currentSpeed = getMedian(speedReadings);
-      } else {
-         if (prevSpeeds == null || prevSpeeds.isEmpty()) {
-            System.out.println("No previous speeds available. Cannot compute acceleration.");
-            return 0.0;
-         }
-         System.out.println("Current speed readings are empty. Using previous speeds only.");
-         // Continuing with current speed as 0
-      }
-
-      // CRC
-      int crcRecomputed = computeCRC(speedReadings);
-      // todo: should i do this for prev speeds too?
-      if (crcOriginal != crcRecomputed) {
-         throw new IllegalArgumentException("Data corruption detected! Invalid speed readings.");
-      }
-
       if (setSpeed <= 0) {
          System.out.println("Invalid set speed. Not applying acceleration.");
          return 0.0;
@@ -46,20 +22,32 @@ public class CruiseControlFT {
          error = 0;
       }
 
+      int currentSpeed = 0;
+      if (speedReadings != null && !speedReadings.isEmpty() && crcOriginal == computeCRC(speedReadings)) {
+         speedReadings = speedReadings.stream()
+         .filter(speed -> speed > 0 && speed < 300) // Valid range
+         .collect(Collectors.toList());
+
+         currentSpeed = getMedian(speedReadings);
+      } else { // If speed readings are invalid or CRC check fails, use previous speeds only
+         if (prevSpeeds == null || prevSpeeds.isEmpty()) { 
+            System.out.println("No previous speeds available. Cannot compute acceleration.");
+            return 0.0;
+         }
+         System.out.println("Current speed readings are empty or invalid. Using previous speeds only.");
+         // Continuing with current speed as 0
+      }
+
       if (prevSpeeds != null && !prevSpeeds.isEmpty()) {
          prevSpeeds = prevSpeeds.stream()
          .filter(speed -> speed > 0 && speed < 300) // Valid speed range 0-300 km/h
          .collect(Collectors.toList());
          
-         final int SPEED_HISTORY_LIMIT = 5;
-         if (prevSpeeds.size() >= SPEED_HISTORY_LIMIT) {
-            prevSpeeds = prevSpeeds.subList(prevSpeeds.size() - SPEED_HISTORY_LIMIT, prevSpeeds.size());
-         }
          if (currentSpeed > 0) {
-            prevSpeeds.add(currentSpeed);
+            prevSpeeds.add(currentSpeed); // Add current speed to previous speeds to consider it in the median calculation
          }
       } else {
-         if (currentSpeed > 0) {
+         if (currentSpeed > 0) { // If current speed is valid, use it as the only speed reading
             System.out.println("Previous speeds are empty. Using current speed only.");
             prevSpeeds = Arrays.asList(currentSpeed);
          } else {
@@ -68,8 +56,9 @@ public class CruiseControlFT {
          }
       }
             
-      // Median of previous speeds instead of average
+      // Median of all the speeds
       int reliableSpeed = getMedian(prevSpeeds);
+
       int lowerBound = setSpeed - error;
       int upperBound = setSpeed + error;
 
