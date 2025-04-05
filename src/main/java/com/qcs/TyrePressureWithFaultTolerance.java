@@ -1,7 +1,6 @@
 package com.qcs;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class TyrePressureWithFaultTolerance {
@@ -37,13 +36,10 @@ public class TyrePressureWithFaultTolerance {
 
         // Identificar pneus com baixa pressão
         for (int i = 0; i < processedPressures.size(); i++) {
-            if (processedPressures.get(i) < targetPressure) {
+            if (processedPressures.get(i) <= targetPressure) {
                 result.add(i);
             }
         }
-
-        // Ordenação dos pneus com menor pressão primeiro
-        result.sort(Comparator.comparingDouble(processedPressures::get));
 
         // Diagnóstico de sensores falhados
         if (!faultySensors.isEmpty()) {

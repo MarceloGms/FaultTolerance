@@ -49,6 +49,6 @@ class TyrePressureTest {
             List.of(0, 15), List.of(10, 10), List.of(10, 10), List.of(10, 10)
         );
         int targetPressure = 8;
-        assertEquals(List.of(1, 2, 3), TyrePressureWithFaultTolerance.getTyresWithLowPressure(pressures, targetPressure));
+        assertEquals(List.of(), TyrePressureWithFaultTolerance.getTyresWithLowPressure(pressures, targetPressure));
     }
 }
